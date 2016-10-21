@@ -11,6 +11,11 @@ function Get-Boxstarter {
 
     Write-Output "Welcome to the Boxstarter Module installer!"
     if(Check-Chocolatey -Force:$Force){
+
+        choco config set proxy http://proxy:80
+        choco config set proxyUser ServiceDCSGReadonly
+        choco config set proxyPassword Readonly@123
+        
         Write-Output "Chocolatey installed, Installing Boxstarter Modules."
         $version = choco -v
         try {
@@ -51,16 +56,7 @@ function Check-Chocolatey {
             }
             $env:ChocolateyInstall = "$env:programdata\chocolatey"
             New-Item $env:ChocolateyInstall -Force -type directory | Out-Null
-            $url="https://chocolatey.org/api/v2/package/chocolatey/"
-            $ProxyString="http://proxy:80"
-            $ProxyUri = New-Object System.Uri($ProxyString)
-            $ProxyUsername = 'ServiceDCSGReadonly'
-            $ProxyPassword = 'Readonly@123'
-            $wc=new-object net.webclient
-            $wp=New-Object System.Net.WebProxy ($ProxyUri, $true)
-            $wp.Credentials=New-Object System.Net.NetworkCredential($ProxyUsername, $ProxyPassword)
-            $wc.Proxy=$wp
-            iex ($wc.DownloadString("https://chocolatey.org/install.ps1"))
+            iex a:\install.ps1
             $env:path="$env:path;$env:ChocolateyInstall\bin"
         }
         else{
@@ -76,7 +72,7 @@ function Enable-Net40 {
     if(Is64Bit) {$fx="framework64"} else {$fx="framework"}
     if(!(test-path "$env:windir\Microsoft.Net\$fx\v4.0.30319")) {
         Write-Host "Downloading .net 4.5..."
-        Get-HttpToFile "http://download.microsoft.com/download/b/a/4/ba4a7e71-2906-4b2d-a0e1-80cf16844f5f/dotnetfx45_full_x86_x64.exe" "$env:temp\net45.exe"
+        Get-HttpToFile "http://dcsartifacts.dell.com/artifactory/files-local/dotnetfx45_full_x86_x64.exe" "$env:temp\net45.exe"
         Write-Host "Installing .net 4.5..."
         $pinfo = New-Object System.Diagnostics.ProcessStartInfo
         $pinfo.FileName = "$env:temp\net45.exe"
@@ -98,14 +94,7 @@ function Enable-Net40 {
 function Get-HttpToFile ($url, $file){
     Write-Verbose "Downloading $url to $file"
     if(Test-Path $file){Remove-Item $file -Force}
-    $ProxyString="http://proxy:80"
-    $ProxyUri = New-Object System.Uri($ProxyString)
-    $ProxyUsername = 'ServiceDCSGReadonly'
-    $ProxyPassword = 'Readonly@123'
     $downloader=new-object net.webclient
-    $wp=New-Object System.Net.WebProxy ($ProxyUri, $true)
-    $wp.Credentials=New-Object System.Net.NetworkCredential($ProxyUsername, $ProxyPassword)
-    $downloader.Proxy=$wp
     try {
         $downloader.DownloadFile($url, $file)
     }

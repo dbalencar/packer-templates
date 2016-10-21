@@ -2,6 +2,10 @@ $WinlogonPath = "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon"
 Remove-ItemProperty -Path $WinlogonPath -Name AutoAdminLogon
 Remove-ItemProperty -Path $WinlogonPath -Name DefaultUserName
 
+$password = ConvertTo-SecureString 'Readonly@123' -AsPlainText -Force
+$credential = New-Object System.Management.Automation.PSCredential('ServiceDCSGReadonly',$password)
+[System.Net.WebRequest]::DefaultWebProxy.Credentials = $credential
+
 . a:\bootstrapper.ps1
 Get-Boxstarter -Force
 

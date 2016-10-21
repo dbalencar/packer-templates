@@ -29,7 +29,9 @@
         "scripts/PackerShutdown.bat",
         "scripts/package.ps1",
         "scripts/SetupComplete-2012.cmd",
-        "scripts/Test-Command.ps1"
+        "scripts/Test-Command.ps1",
+        "scripts/bootstrapper.ps1",
+        "scripts/install.ps1"
       ]
     },
     {
@@ -60,8 +62,7 @@
         "scripts/PackerShutdown.bat",
         "scripts/package.ps1",
         "scripts/SetupComplete-2012.cmd",
-        "scripts/Test-Command.ps1",
-        "scripts/bootstrapper.ps1"
+        "scripts/Test-Command.ps1"
       ]
     }
   ],

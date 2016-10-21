@@ -4,6 +4,18 @@ $ErrorActionPreference = "Stop"
 Write-Host "Enabling file sharing firewall rules"
 netsh advfirewall firewall set rule group="File and Printer Sharing" new enable=yes
 
+[byte[]]$defConSet='70,0,0,0,4,0,0,0,5,0,0,0,0,0,0,0,0,0,0,0,63,0,0,0,104,116,116,112,58,47,47,100,101,108,108,119,101,98,102,97,114,109,46,117,115,46,100,101,108,108,46,99,111,109,47,68,82,65,71,78,101,116,47,80,65,67,47,80,65,67,45,71,108,111,98,97,108,45,86,105,115,116,97,46,97,115,112,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0' -split ','
+$regKeyPath = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Internet Settings\Connections\"
+Set-ItemProperty -Path $regKeyPath -Name DefaultConnectionSettings -Value $defConSet
+
+$password = ConvertTo-SecureString 'Readonly@123' -AsPlainText -Force
+$credential = New-Object System.Management.Automation.PSCredential('ServiceDCSGReadonly',$password)
+[System.Net.WebRequest]::DefaultWebProxy.Credentials = $credential
+
+choco config set proxy http://proxy:80
+choco config set proxyUser ServiceDCSGReadonly
+choco config set proxyPassword Readonly@123
+
 if(Test-Path "C:\Users\vagrant\VBoxGuestAdditions.iso") {
     Write-Host "Installing Guest Additions"
     certutil -addstore -f "TrustedPublisher" A:\oracle.cer
